@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏥 ניהול קליניקה - גל פרידמן</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        input, select {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+        
+        .families-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+        }
+        
+        .family-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 20px;
+        }
+        
+        .family-header {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+        
+        .family-name {
+            font-size: 24px;
+            color: #333;
+        }
+        
+        .family-rate {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            min-width: 40px;
+            min-height: 40px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            background: transparent;
+            padding: 5px;
+            transition: background 0.2s ease;
+        }
+        
+        .btn-icon:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-icon:active {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .sessions-list {
+            max-height: 320px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .session-item {
+            display: flex;
+            justify-between: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-date {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .session-hours {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-unpaid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .session-amount {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .total-box {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .total-regular {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        }
+        
+        .add-session {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .add-session input {
+            padding: 12px;
+            font-size: 14px;
+        }
+        
+        .add-session button {
+            grid-column: 1 / -1;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        
+        .payment-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 2px solid #fbbf24;
+        }
+        
+        .payment-input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: stretch;
+        }
+        
+        .payment-input-group input {
+            padding: 10px;
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .payment-input-group input[type="date"] {
+            flex: 0 0 auto;
+            width: 140px;
+        }
+        
+        .payment-input-group input[type="number"] {
+            min-width: 100px;
+        }
+        
+        .payment-input-group button {
+            padding: 10px 20px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease;
+            flex: 0 0 auto;
+        }
+        
+        .payment-input-group button:hover {
+            background: #d97706;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);
+            transform: translateY(-1px);
+        }
+        
+        .balance-display {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #fbbf24;
+        }
+        
+        .balance-label {
+            font-size: 11px;
+            color: #78350f;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .balance-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #92400e;
+        }
+        
+        .payments-history {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .payments-history-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .payment-date {
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .payment-amount {
+            color: #16a34a;
+            font-weight: 700;
+        }
+        
+        .btn-delete-payment {
+            padding: 5px 10px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        
+        .btn-delete-payment:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .modal-title {
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 36px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: auto;
+            height: auto;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(102, 126, 234, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .save-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #16a34a;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 9998;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .report-item {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .report-month {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .report-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+            
+            .families-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .payment-input-group {
+                flex-direction: column;
+            }
+            
+            .payment-input-group input[type="date"] {
+                width: 100%;
+            }
+            
+            .payment-input-group button {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .payment-input-group input[type="date"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">🏥 טוען נתונים...</div>
+    </div>
+
+    <div class="container">
+        <!-- Header Card -->
+        <div class="card">
+            <h1>🏥 ניהול קליניקה - גל פרידמן</h1>
+            
+            <!-- Cloud Storage Info -->
+            <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 2px solid #6ee7b7;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 24px;">📊</span>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 700; color: #065f46; margin-bottom: 5px;">מחובר ל-Google Sheets</div>
+                        <div style="font-size: 13px; color: #047857;">הנתונים נשמרים אוטומטית ונגישים מכל מכשיר • גם אפשר לראות ב-Google Sheets</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">הכנסות החודש</div>
+                    <div class="stat-value" id="monthlyIncome">₪0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">סה״כ משפחות</div>
+                    <div class="stat-value" id="totalFamilies">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">טיפולים החודש</div>
+                    <div class="stat-value" id="monthlySessions">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">ממתינים לתשלום</div>
+                    <div class="stat-value" id="totalUnpaid">₪0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Card -->
+        <div class="card">
+            <div class="controls">
+                <input type="text" id="newFamilyName" placeholder="שם המשפחה">
+                <input type="number" id="newFamilyRate" placeholder="תעריף לשעה" step="0.01">
+                <button class="btn-primary" onclick="app.addFamily()">➕ הוסף משפחה</button>
+            </div>
+            
+            <div class="controls">
+                <button class="btn-secondary" onclick="app.showReport()">📊 דוח חודשי</button>
+                <button class="btn-secondary" onclick="app.exportCSV()">📥 ייצוא</button>
+            </div>
+            
+            <div class="controls">
+                <input type="text" id="searchInput" placeholder="🔍 חיפוש" oninput="app.render()">
+                <select id="sortSelect" onchange="app.render()">
+                    <option value="name">מיון לפי שם</option>
+                    <option value="total">מיון לפי סכום</option>
+                    <option value="debt">הצג רק חייבים</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Families Grid -->
+        <div class="families-grid" id="familiesGrid"></div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="modal" id="reportModal" onclick="if(event.target.id==='reportModal') app.closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">דוח חודשי</h2>
+                <button class="modal-close" onclick="app.closeModal()">×</button>
+            </div>
+            <div id="reportContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Google Sheets API Configuration
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztA3yBYjETW3gAABjLEYOLsViYU8ysgmkZC-yCM7P8fau6ozv2wGLeqj1mPXEj_Cfs/exec';
+        
+        const app = {
+            families: [],
+            
+            async init() {
+                await this.loadData();
+                this.render();
+                this.updateStats();
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            },
+            
+            async loadData() {
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL + '?action=get');
+                    const result = await response.json();
+                    
+                    if (result.success && result.data) {
+                        this.families = JSON.parse(result.data);
+                    } else {
+                        this.families = [];
+                    }
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                    alert('⚠️ שגיאה בטעינת הנתונים מ-Google Sheets');
+                    this.families = [];
+                }
+            },
+            
+            async save() {
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'action=save&data=' + encodeURIComponent(JSON.stringify(this.families))
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showSaveNotification();
+                    } else {
+                        throw new Error('Save failed');
+                    }
+                } catch (e) {
+                    console.error('Error saving data:', e);
+                    alert('⚠️ שגיאה בשמירת הנתונים ל-Google Sheets');
+                }
+                this.render();
+                this.updateStats();
+            },
+            
+            showSaveNotification() {
+                // Remove existing notification if present
+                const existing = document.querySelector('.save-notification');
+                if (existing) existing.remove();
+                
+                // Create and show new notification
+                const notification = document.createElement('div');
+                notification.className = 'save-notification';
+                notification.textContent = '✓ נשמר ב-Google Sheets';
+                document.body.appendChild(notification);
+                
+                // Remove after 2 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                    setTimeout(() => notification.remove(), 300);
+                }, 2000);
+            },
+            
+            addFamily() {
+                const name = document.getElementById('newFamilyName').value.trim();
+                const rate = parseFloat(document.getElementById('newFamilyRate').value);
+                
+                if (!name || !rate || rate <= 0) {
+                    alert('❌ נא למלא שם ותעריף');
+                    return;
+                }
+                
+                this.families.push({
+                    id: Date.now(),
+                    name: name,
+                    rate: rate,
+                    sessions: [],
+                    payments: []
+                });
+                
+                document.getElementById('newFamilyName').value = '';
+                document.getElementById('newFamilyRate').value = '';
+                this.save();
+            },
+            
+            deleteFamily(id) {
+                const family = this.families.find(f => f.id === id);
+                
+                if (!confirm(`⚠️ האם אתה בטוח שברצונך למחוק את המשפחה "${family.name}"?`)) {
+                    return;
+                }
+                
+                const sessionsCount = family.sessions.length;
+                const totalAmount = this.calculateTotal(family);
+                const confirmText = sessionsCount > 0 
+                    ? `למשפחה זו יש ${sessionsCount} טיפולים בסכום כולל של ₪${totalAmount.toFixed(2)}.\n\nהאם אתה בטוח לחלוטין שברצונך למחוק?`
+                    : `האם אתה בטוח לחלוטין שברצונך למחוק את "${family.name}"?`;
+                
+                if (!confirm(confirmText)) {
+                    return;
+                }
+                
+                this.families = this.families.filter(f => f.id !== id);
+                this.save();
+            },
+            
+            editFamily(id) {
+                const family = this.families.find(f => f.id === id);
+                const name = prompt('שם:', family.name);
+                if (name && name.trim()) family.name = name.trim();
+                
+                const rate = prompt('תעריף:', family.rate);
+                if (rate && !isNaN(rate)) family.rate = parseFloat(rate);
+                
+                this.save();
+            },
+            
+            addSession(familyId) {
+                const date = document.getElementById(`date-${familyId}`).value;
+                const hours = parseFloat(document.getElementById(`hours-${familyId}`).value);
+                
+                if (!date || !hours) {
+                    alert('❌ נא להזין תאריך ושעות');
+                    return;
+                }
+                
+                const family = this.families.find(f => f.id === familyId);
+                family.sessions.push({
+                    id: Date.now(),
+                    date: date,
+                    hours: hours
+                });
+                
+                family.sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                document.getElementById(`date-${familyId}`).value = '';
+                document.getElementById(`hours-${familyId}`).value = '';
+                this.save();
+            },
+            
+            deleteSession(familyId, sessionId) {
+                const family = this.families.find(f => f.id === familyId);
+                const session = family.sessions.find(s => s.id === sessionId);
+                const amount = (session.hours * family.rate).toFixed(2);
+                
+                if (confirm(`⚠️ למחוק טיפול מתאריך ${new Date(session.date).toLocaleDateString('he-IL')} (₪${amount})?`)) {
+                    family.sessions = family.sessions.filter(s => s.id !== sessionId);
+                    this.save();
+                }
+            },
+            
+            addPayment(familyId) {
+                const amount = parseFloat(document.getElementById(`payment-${familyId}`).value);
+                const date = document.getElementById(`payment-date-${familyId}`).value;
+                
+                if (!amount || amount <= 0) {
+                    alert('❌ נא להזין סכום תקין');
+                    return;
+                }
+                
+                if (!date) {
+                    alert('❌ נא להזין תאריך');
+                    return;
+                }
+                
+                const family = this.families.find(f => f.id === familyId);
+                if (!family.payments) family.payments = [];
+                
+                family.payments.push({
+                    id: Date.now(),
+                    amount: amount,
+                    date: date
+                });
+                
+                // Sort payments by date (newest first)
+                family.payments.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                document.getElementById(`payment-${familyId}`).value = '';
+                document.getElementById(`payment-date-${familyId}`).value = new Date().toISOString().split('T')[0];
+                this.save();
+            },
+            
+            deletePayment(familyId, paymentId) {
+                const family = this.families.find(f => f.id === familyId);
+                const payment = family.payments.find(p => p.id === paymentId);
+                
+                if (confirm(`⚠️ למחוק תשלום מתאריך ${new Date(payment.date).toLocaleDateString('he-IL')} בסכום ₪${payment.amount.toFixed(2)}?`)) {
+                    family.payments = family.payments.filter(p => p.id !== paymentId);
+                    this.save();
+                }
+            },
+            
+            calculateTotal(family) {
+                return family.sessions.reduce((sum, s) => sum + (s.hours * family.rate), 0);
+            },
+            
+            calculateBalance(family) {
+                const totalOwed = this.calculateTotal(family);
+                const totalPaid = (family.payments || []).reduce((sum, p) => sum + p.amount, 0);
+                return totalOwed - totalPaid;
+            },
+            
+            updateStats() {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                let monthlyIncome = 0;
+                let monthlySessions = 0;
+                let totalUnpaid = 0;
+                
+                this.families.forEach(family => {
+                    // Calculate monthly income from sessions
+                    family.sessions.forEach(session => {
+                        const sessionDate = new Date(session.date);
+                        const amount = session.hours * family.rate;
+                        
+                        if (sessionDate.getMonth() === currentMonth && sessionDate.getFullYear() === currentYear) {
+                            monthlyIncome += amount;
+                            monthlySessions++;
+                        }
+                    });
+                    
+                    // Calculate total unpaid for this family
+                    totalUnpaid += this.calculateBalance(family);
+                });
+                
+                document.getElementById('monthlyIncome').textContent = `₪${monthlyIncome.toFixed(2)}`;
+                document.getElementById('totalFamilies').textContent = this.families.length;
+                document.getElementById('monthlySessions').textContent = monthlySessions;
+                document.getElementById('totalUnpaid').textContent = `₪${totalUnpaid.toFixed(2)}`;
+            },
+            
+            getFiltered() {
+                const search = document.getElementById('searchInput').value.toLowerCase();
+                const sort = document.getElementById('sortSelect').value;
+                
+                let filtered = this.families.filter(f => 
+                    f.name.toLowerCase().includes(search)
+                );
+                
+                if (sort === 'name') {
+                    filtered.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+                } else if (sort === 'total') {
+                    filtered.sort((a, b) => this.calculateTotal(b) - this.calculateTotal(a));
+                } else if (sort === 'debt') {
+                    filtered = filtered.filter(f => this.calculateBalance(f) > 0);
+                    filtered.sort((a, b) => this.calculateBalance(b) - this.calculateBalance(a));
+                }
+                
+                return filtered;
+            },
+            
+            render() {
+                const grid = document.getElementById('familiesGrid');
+                const filtered = this.getFiltered();
+                
+                if (filtered.length === 0) {
+                    grid.innerHTML = `
+                        <div class="card" style="grid-column: 1/-1;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <p style="font-size: 20px; font-weight: 600;">אין משפחות</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                grid.innerHTML = filtered.map(family => {
+                    const total = this.calculateTotal(family);
+                    const balance = this.calculateBalance(family);
+                    
+                    const sessionsHTML = family.sessions.length === 0 ? `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📅</div>
+                            <p>אין טיפולים</p>
+                        </div>
+                    ` : family.sessions.map(session => `
+                        <div class="session-item">
+                            <div class="session-info">
+                                <div class="session-date">${new Date(session.date).toLocaleDateString('he-IL')}</div>
+                                <div class="session-hours">${session.hours} שעות</div>
+                            </div>
+                            <span class="session-amount">₪${(session.hours * family.rate).toFixed(2)}</span>
+                            <button class="btn-icon" onclick="app.deleteSession(${family.id}, ${session.id})">🗑</button>
+                        </div>
+                    `).join('');
+                    
+                    return `
+                        <div class="family-card">
+                            <div class="family-header">
+                                <div>
+                                    <div class="family-name">${family.name}</div>
+                                    <div class="family-rate">₪${family.rate} לשעה</div>
+                                </div>
+                                <div class="header-buttons">
+                                    <button class="btn-icon" onclick="app.editFamily(${family.id})">✏️</button>
+                                    <button class="btn-icon" onclick="app.deleteFamily(${family.id})">🗑️</button>
+                                </div>
+                            </div>
+                            
+                            <div class="sessions-list">
+                                ${sessionsHTML}
+                            </div>
+                            
+                            <div class="total-box total-regular">
+                                <span>סה״כ</span>
+                                <span>₪${total.toFixed(2)}</span>
+                            </div>
+                            
+                            <div class="add-session">
+                                <input type="date" id="date-${family.id}">
+                                <input type="number" id="hours-${family.id}" placeholder="שעות" step="0.5">
+                                <button class="btn-primary" onclick="app.addSession(${family.id})">
+                                    ➕ הוסף טיפול חדש
+                                </button>
+                            </div>
+                            
+                            <div class="payment-section">
+                                <div class="payment-input-group">
+                                    <input type="date" id="payment-date-${family.id}" value="${new Date().toISOString().split('T')[0]}">
+                                    <input type="number" id="payment-${family.id}" placeholder="כמה שולם?" step="0.01">
+                                    <button onclick="app.addPayment(${family.id})">💰 תשלום</button>
+                                </div>
+                                <div class="balance-display">
+                                    <div class="balance-label">יתרת חוב</div>
+                                    <div class="balance-amount" style="color: ${balance > 0 ? '#dc2626' : '#16a34a'}">
+                                        ₪${balance.toFixed(2)}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            ${family.payments && family.payments.length > 0 ? `
+                                <div class="payments-history">
+                                    <div class="payments-history-title">
+                                        <span>📋 היסטוריית תשלומים</span>
+                                        <span style="font-size: 12px; color: #666;">סה"כ שולם: ₪${family.payments.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}</span>
+                                    </div>
+                                    ${family.payments.map(payment => `
+                                        <div class="payment-item">
+                                            <span class="payment-date">${new Date(payment.date).toLocaleDateString('he-IL')}</span>
+                                            <span class="payment-amount">₪${payment.amount.toFixed(2)}</span>
+                                            <button class="btn-delete-payment" onclick="app.deletePayment(${family.id}, ${payment.id})">🗑</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            },
+            
+            showReport() {
+                const months = {};
+                
+                // Calculate total income from sessions
+                this.families.forEach(family => {
+                    family.sessions.forEach(session => {
+                        const date = new Date(session.date);
+                        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        
+                        if (!months[key]) {
+                            months[key] = { total: 0, sessions: 0, paid: 0, unpaid: 0 };
+                        }
+                        
+                        const amount = session.hours * family.rate;
+                        months[key].total += amount;
+                        months[key].sessions++;
+                        months[key].unpaid += amount; // Initially all unpaid
+                    });
+                    
+                    // Add actual payments
+                    if (family.payments) {
+                        family.payments.forEach(payment => {
+                            const date = new Date(payment.date);
+                            const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                            
+                            if (!months[key]) {
+                                months[key] = { total: 0, sessions: 0, paid: 0, unpaid: 0 };
+                            }
+                            
+                            months[key].paid += payment.amount;
+                        });
+                    }
+                });
+                
+                // Calculate unpaid as total minus paid
+                Object.keys(months).forEach(key => {
+                    months[key].unpaid = months[key].total - months[key].paid;
+                    if (months[key].unpaid < 0) months[key].unpaid = 0; // Can't be negative
+                });
+                
+                const report = Object.entries(months).sort((a, b) => b[0].localeCompare(a[0]));
+                const content = document.getElementById('reportContent');
+                
+                if (report.length === 0) {
+                    content.innerHTML = '<p style="text-align: center; padding: 40px;">אין נתונים</p>';
+                } else {
+                    content.innerHTML = report.map(([month, data]) => {
+                        const date = new Date(month + '-01');
+                        const monthName = date.toLocaleDateString('he-IL', { year: 'numeric', month: 'long' });
+                        
+                        return `
+                            <div class="report-item">
+                                <h3 class="report-month">${monthName}</h3>
+                                <div class="report-stats">
+                                    <div><strong>הכנסות:</strong> ₪${data.total.toFixed(2)}</div>
+                                    <div><strong>טיפולים:</strong> ${data.sessions}</div>
+                                    <div><strong>שולם:</strong> ₪${data.paid.toFixed(2)}</div>
+                                    <div><strong>ממתין:</strong> ₪${data.unpaid.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                document.getElementById('reportModal').classList.add('active');
+            },
+            
+            closeModal() {
+                document.getElementById('reportModal').classList.remove('active');
+            },
+            
+            exportCSV() {
+                let csv = '\ufeffמשפחה,תאריך,שעות,תעריף,סכום,סטטוס\n';
+                
+                this.families.forEach(family => {
+                    family.sessions.forEach(session => {
+                        csv += `${family.name},${session.date},${session.hours},${family.rate},${(session.hours * family.rate).toFixed(2)},${session.paid ? 'שולם' : 'ממתין'}\n`;
+                    });
+                });
+                
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `clinic_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+            }
+        };
+        
+        // Initialize app
+        app.init();
+    </script>
+</body>
+</html>
